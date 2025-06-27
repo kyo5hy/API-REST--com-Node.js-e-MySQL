@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Como Criar uma API com Node.js, MySQL e Frontend</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <style>
+    pre code {
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .search-bar {
+      transition: all 0.3s ease;
+    }
+    .search-bar:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+  <!-- Header -->
+  <header class="bg-blue-800 text-white shadow-lg">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Escrito por Caique Cardim</h1>
+      <div class="flex items-center space-x-4">
+        <input 
+          type="text" 
+          placeholder="Pesquisar no guia..." 
+          class="search-bar px-4 py-2 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        >
+        <a 
+          href="https://github.com/kyo5hy" 
+          target="_blank" 
+          class="text-lg font-semibold hover:text-blue-200 transition-colors"
+        >
+          Kyoshy
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-6 py-12 max-w-5xl">
+    <section class="mb-12">
+      <h1 class="text-4xl font-bold text-blue-800 mb-6 text-center">
+        API REST com Node.js e MySQL: Padrão Repositório e Melhores Práticas
+      </h1>
+      <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+          Este projeto demonstra como integrar Node.js com MySQL utilizando as melhores práticas, como o Padrão Repositório, que separa a lógica de negócios da lógica de acesso a dados. Além disso, implementa uma API RESTful completa com operações CRUD usando Express.
+          Para garantir qualidade e confiabilidade, também inclui testes automatizados com Jest.
+        </p>
+        <p class="text-lg text-gray-700 leading-relaxed mb-6">
+          Este projeto mostra como criar:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-blue-800 font-semibold">✅ Backend</p>
+            <p class="text-gray-700">Node.js</p>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-blue-800 font-semibold">✅ Banco de Dados</p>
+            <p class="text-gray-700">MySQL</p>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-blue-800 font-semibold">✅ Frontend</p>
+            <p class="text-gray-700">HTML Simples</p>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-blue-800 font-semibold">✅ Node.js</p>
+            <p class="text-gray-700">Criar API REST</p>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-blue-800 font-semibold">✅ Ferramentas</p>
+            <p class="text-gray-700">Insomnia e Workbench</p>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-blue-800 font-semibold">✅ Padrão Repositório</p>
+            <p class="text-gray-700">Organização de Código</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🛠️ 1. Entendendo as Ferramentas</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">Antes de começar, entenda para que serve cada ferramenta:</p>
+      <ul class="list-disc list-inside text-gray-700 space-y-3">
+        <li><strong>Node.js</strong>: Um ambiente de execução que permite rodar JavaScript fora do navegador, no servidor. Usamos para criar o backend — o cérebro que processa e responde às requisições.</li>
+        <li><strong>MySQL</strong>: Um sistema de banco de dados relacional. Ele armazena informações importantes, como o nome e e-mail dos usuários que registraremos.</li>
+        <li><strong>MySQL Workbench</strong>: Uma ferramenta visual que simplifica a criação de bancos de dados, execução de comandos SQL e visualização de tabelas graficamente — sem depender apenas da linha de comando.</li>
+        <li><strong>Visual Studio Code (VSCode)</strong>: O editor onde você escreverá o código.</li>
+        <li>➕ <strong>Extensão "Live Server"</strong>: Permite abrir páginas HTML localmente com atualizações automáticas sempre que você salvar o arquivo.</li>
+      </ul>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">📂 2. Organização do Projeto</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">Criar uma estrutura organizada torna o código mais fácil de entender e manter. Veja como ficará a pasta do projeto:</p>
+      <pre><code class="language-plaintext">
+node-mysql-repository/
+├── repositories/        # Armazena a lógica de acesso a dados
+├── .env                 # Arquivo com credenciais (usuário e senha)
+├── app.js               # Arquivo principal: define o servidor e rotas
+├── db.js                # Gerencia a conexão com o banco de dados
+├── initDB.js            # Cria automaticamente a tabela se ela não existir
+├── index.html           # A interface visual (frontend)
+├── package.json         # Arquivo que descreve as dependências (bibliotecas)
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">✅ <strong>Importante:</strong> Cada parte tem uma função bem definida, tornando o código mais organizado e fácil de manter.</p>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🛢️ 3. Criando o Banco de Dados</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">O banco de dados é onde <strong>armazenamos as informações dos usuários</strong>.</p>
+      <p class="text-gray-700 mb-6 leading-relaxed">No MySQL Workbench ou no terminal do MySQL, execute os seguintes comandos:</p>
+      <pre><code class="language-sql">
+CREATE DATABASE testdb;   -- Cria o banco de dados chamado testdb
+USE testdb;               -- Seleciona este banco de dados para trabalhar
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,  -- ID único que incrementa automaticamente
+  name VARCHAR(255),                  -- Nome do usuário (até 255 caracteres)
+  email VARCHAR(255)                  -- E-mail do usuário
+);
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">🔍 <strong>Por que fazer assim?</strong></p>
+      <ul class="list-disc list-inside text-gray-700 space-y-3">
+        <li>A tabela <code>users</code> terá três campos:</li>
+        <li>➡️ <code>id</code>: Um número único que identifica cada usuário.</li>
+        <li>➡️ <code>name</code>: O nome do usuário.</li>
+        <li>➡️ <code>email</code>: O e-mail do usuário.</li>
+        <li><code>AUTO_INCREMENT</code>: Garante que o banco de dados atribua automaticamente um <code>id</code> único para cada novo usuário, evitando duplicatas.</li>
+      </ul>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🔑 4. Configurando a Conexão com o Banco de Dados</h2>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">📄 4.1 O Arquivo <code>.env</code></h3>
+      <p class="text-gray-700 mb-6 leading-relaxed">O arquivo <code>.env</code> armazena as credenciais de forma <strong>segura</strong> e <strong>separada</strong> do código principal:</p>
+      <pre><code class="language-plaintext">
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=your_password
+DB_NAME=testdb
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Por quê?</strong> Evita expor senhas no código e facilita alterações: se o usuário ou senha mudar, basta atualizar este arquivo.</p>
+
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4 mt-8">📄 4.2 O Arquivo <code>db.js</code></h3>
+      <p class="text-gray-700 mb-6 leading-relaxed">Este código <strong>conecta</strong> nossa aplicação ao banco de dados:</p>
+      <pre><code class="language-javascript">
+const mysql = require('mysql2/promise');  // Biblioteca para MySQL
+require('dotenv').config();               // Carrega automaticamente o arquivo .env
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,     // Obtido do .env
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
+});
+
+module.exports = pool;  // Exporta para uso em outras partes
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Por que usar <code>createPool</code>?</strong> O <code>createPool</code> cria um <strong>pool de conexões</strong>, ou seja, várias conexões estão disponíveis para uso, tornando o acesso ao banco de dados mais <strong>eficiente e rápido</strong>. Isso evita abrir e fechar uma nova conexão para cada operação.</p>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">💾 5. Criando o Repositório</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">O <strong>Repositório</strong> é uma camada de código onde centralizamos toda a lógica de interação com o banco de dados, mantendo a aplicação organizada e separada.</p>
+      <pre><code class="language-javascript">
+const db = require('../db');  // Importa a conexão
+
+class UserRepository {
+  // Criar usuário
+  async create(user) {
+    const [result] = await db.execute(
+      'INSERT INTO users (name, email) VALUES (?, ?)',
+      [user.name, user.email]
+    );
+    return { id: result.insertId, ...user };
+  }
+
+  // Buscar por ID
+  async findById(id) {
+    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]);
+    return rows[0];
+  }
+
+  // Listar todos
+  async findAll() {
+    const [rows] = await db.execute('SELECT * FROM users');
+    return rows;
+  }
+
+  // Atualizar
+  async update(id, user) {
+    await db.execute(
+      'UPDATE users SET name = ?, email = ? WHERE id = ?',
+      [user.name, user.email, id]
+    );
+  }
+
+  // Deletar
+  async delete(id) {
+    await db.execute('DELETE FROM users WHERE id = ?', [id]);
+  }
+}
+
+module.exports = new UserRepository();
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">✅ <strong>Explicação detalhada dos comandos SQL usados:</strong></p>
+      <ul class="list-disc list-inside text-gray-700 space-y-3">
+        <li><code>INSERT INTO</code>: Insere um novo registro na tabela.</li>
+        <li><code>VALUES (?, ?)</code>: Usamos <code>?</code> como <strong>placeholders</strong> para prevenir ataques de SQL Injection e tornar o código mais seguro.</li>
+        <li><code>SELECT * FROM</code>: Recupera todos os campos de um ou mais registros.</li>
+        <li><code>WHERE id = ?</code>: Especifica uma <strong>condição</strong> — neste caso, seleciona um usuário específico por <code>id</code>.</li>
+        <li><code>UPDATE</code>: Atualiza campos de um registro existente.</li>
+        <li><code>DELETE</code>: Remove um registro da tabela.</li>
+      </ul>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Por que separar assim?</strong> Para manter a lógica organizada, manutenível e reutilizável. Por exemplo, se quisermos mudar como os usuários são recuperados, basta modificar esta parte.</p>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🌐 6. Criando a API (Servidor)</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">Agora vamos criar o <strong>servidor</strong> que lida com as requisições e responde adequadamente.</p>
+      <pre><code class="language-javascript">
+const express = require('express');
+const cors = require('cors');
+const userRepository = require('./repositories/UserRepository');
+
+const app = express();
+
+app.use(cors());             // Habilita o acesso à API
+app.use(express.json());     // Permite analisar JSON no corpo da requisição
+
+// Listar todos os usuários
+app.get('/users', async (req, res) => {
+  const users = await userRepository.findAll();
+  res.json(users);
+});
+
+// Criar novo usuário
+app.post('/users', async (req, res) => {
+  const user = await userRepository.create(req.body);
+  res.status(201).json(user);
+});
+
+// Atualizar usuário
+app.put('/users/:id', async (req, res) => {
+  await userRepository.update(req.params.id, req.body);
+  res.sendStatus(204);
+});
+
+// Deletar usuário
+app.delete('/users/:id', async (req, res) => {
+  await userRepository.delete(req.params.id);
+  res.sendStatus(204);
+});
+
+app.listen(3000, () => console.log('🚀 Server running on http://localhost:3000'));
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">✅ <strong>O que está acontecendo aqui?</strong></p>
+      <ul class="list-disc list-inside text-gray-700 space-y-3">
+        <li><code>GET /users</code>: Lista todos os usuários.</li>
+        <li><code>POST /users</code>: Cria um novo usuário com os dados enviados no corpo da requisição.</li>
+        <li><code>PUT /users/:id</code>: Atualiza um usuário específico identificado por <code>id</code>.</li>
+        <li><code>DELETE /users/:id</code>: Deleta o usuário com o <code>id</code> especificado.</li>
+      </ul>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Por que usar <code>userRepository</code>?</strong> Ele centraliza todas as operações do banco de dados, então o servidor apenas <strong>chama métodos</strong> (<code>findAll</code>, <code>create</code>, <code>update</code>, <code>delete</code>), mantendo o código limpo e separado.</p>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🏗️ 7. Criando a Tabela Automaticamente</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">Este arquivo garante que a tabela <code>users</code> seja criada automaticamente se não existir.</p>
+      <pre><code class="language-javascript">
+const db = require('./db');
+
+async function init() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255),
+      email VARCHAR(255)
+    )
+  `);
+  console.log('✅ Tabela de usuários verificada/criada');
+}
+
+init();
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Por que isso é útil?</strong> Evita erros ao executar o projeto pela primeira vez ou em novos ambientes, garantindo que a tabela necessária exista sem criação manual.</p>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🎨 8. Criando o Frontend (Interface)</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">Agora vamos criar uma interface HTML simples para interagir com nossa API:</p>
+      <pre><code class="language-html">
+<input type="text" id="addName" placeholder="Nome">
+<input type="email" id="addEmail" placeholder="E-mail">
+<button onclick="addUser()">Adicionar</button>
+
+<script>
+  async function addUser() {
+    const name = document.getElementById('addName').value;
+    const email = document.getElementById('addEmail').value;
+
+    await fetch('http://localhost:3000/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    });
+
+    alert('Usuário adicionado com sucesso!');
+  }
+</script>
+      </code></pre>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Como funciona?</strong></p>
+      <ol class="list-decimal list-inside text-gray-700 space-y-3">
+        <li>O usuário preenche os campos <code>Nome</code> e <code>E-mail</code>.</li>
+        <li>Clica no botão "Adicionar".</li>
+        <li>A função <code>addUser()</code> obtém esses valores e envia uma <strong>requisição HTTP POST</strong> para a API com os dados.</li>
+        <li>O backend recebe, processa e armazena os dados no banco de dados.</li>
+        <li>O frontend exibe um alerta confirmando a ação.</li>
+      </ol>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🧪 9. Como Testar Tudo</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">✅ <strong>Passos:</strong></p>
+      <ol class="list-decimal list-inside text-gray-700 space-y-3">
+        <li><strong>No terminal:</strong></li>
+        <ul class="list-disc list-inside ml-6 space-y-2">
+          <li><code>node initDB.js</code> → Garante que a tabela seja criada.</li>
+          <li><code>node app.js</code> → Inicia o servidor.</li>
+        </ul>
+        <li><strong>No navegador:</strong></li>
+        <ul class="list-disc list-inside ml-6 space-y-2">
+          <li>Abra o <code>index.html</code> com o Live Server.</li>
+          <li>Preencha <code>Nome</code> e <code>E-mail</code> → clique em "Adicionar".</li>
+        </ul>
+        <li>Verifique se o alerta aparece e se os dados foram armazenados no banco de dados.</li>
+      </ol>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">🚀 Como Testar com Insomnia ou Postman</h2>
+      <ol class="list-decimal list-inside text-gray-700 space-y-3">
+        <li>Abra o <strong>Insomnia</strong> (ou <strong>Postman</strong>).</li>
+        <li>Crie uma <strong>nova requisição</strong> com o método desejado:</li>
+        <ul class="list-disc list-inside ml-6 space-y-3">
+          <li>✅ <code>GET</code> → <code>http://localhost:3000/users</code> → Retorna todos os usuários.</li>
+          <li>✅ <code>POST</code> → <code>http://localhost:3000/users</code> → Envie um <strong>JSON</strong> no corpo:</li>
+          <pre><code class="language-json">
+{ "name": "João", "email": "joao@email.com" }
+          </code></pre>
+          <li>✅ <code>PUT</code> → <code>http://localhost:3000/users/1</code> → Atualiza o usuário com ID 1.</li>
+          <li>✅ <code>DELETE</code> → <code>http://localhost:3000/users/1</code> → Deleta o usuário com ID 1.</li>
+        </ul>
+        <li>Clique em "Enviar" e verifique as respostas da API.</li>
+      </ol>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg mb-10">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">💡 10. Dicas Extras</h2>
+      <ul class="list-disc list-inside text-gray-700 space-y-3">
+        <li><strong>Use Insomnia ou Postman</strong> para testar as rotas antes de criar a interface HTML.</li>
+        <li><strong>Automatize</strong> reinícios:</li>
+        <ul class="list-disc list-inside ml-6 space-y-2">
+          <li>➡️ Instale o <code>nodemon</code>: <code>npm install -g nodemon</code></li>
+          <li>➡️ Depois execute: <code>nodemon app.js</code></li>
+        </ul>
+        <li><strong>Melhorias futuras:</strong></li>
+        <ul class="list-disc list-inside ml-6 space-y-2">
+          <li>➡️ Adicione um botão para listar todos os usuários e exibi-los em uma tabela no frontend.</li>
+          <li>➡️ Atualize para frameworks como <strong>React</strong> ou <strong>Vue.js</strong> para interfaces mais interativas e sofisticadas.</li>
+        </ul>
+      </ul>
+    </section>
+
+    <section class="bg-white p-8 rounded-lg shadow-lg">
+      <h2 class="text-3xl font-semibold text-blue-800 mb-6">✅ 11. Conclusão</h2>
+      <p class="text-gray-700 mb-6 leading-relaxed">Agora você tem uma aplicação <strong>completa</strong>!</p>
+      <ul class="list-disc list-inside text-gray-700 space-y-3">
+        <li>✅ Criar e organizar um backend com Node.js</li>
+        <li>✅ Integrar com um banco de dados MySQL</li>
+        <li>✅ Aplicar melhores práticas: Padrão Repositório</li>
+        <li>✅ Implementar validação e tratamento de erros</li>
+        <li>✅ Habilitar CORS para o frontend</li>
+        <li>✅ Criar uma interface web interativa para consumir a API</li>
+      </ul>
+      <p class="text-gray-700 mt-6 leading-relaxed">➡️ <strong>Por que isso é importante?</strong> Este é o modelo básico de muitos sistemas usados em empresas e startups. Agora você entende como <strong>backend</strong>, <strong>banco de dados</strong> e <strong>frontend</strong> se <strong>conectam</strong>!</p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto px-6 text-center">
+      <p>Desenvolvido por <a href="https://github.com/kyo5hy" target="_blank" class="underline hover:text-blue-300">Kyoshy</a> | 2025</p>
+    </div>
+  </footer>
+</body>
+</html>
